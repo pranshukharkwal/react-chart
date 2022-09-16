@@ -1,7 +1,10 @@
 import React from "react";
 function Choice(props) {
   return (
-    <button className="choice" onClick={props.onClick}>
+    <button
+      className="choice btn waves-effect waves-light"
+      onClick={props.onClick}
+    >
       {props.value}
     </button>
   );
@@ -9,7 +12,7 @@ function Choice(props) {
 
 function Toggle(props) {
   return (
-    <div>
+    <div className="center">
       <Choice value="Waterfall" onClick={props.waterfallClick} />
       <Choice value="Net Difference" onClick={props.netDifferenceClick} />
     </div>

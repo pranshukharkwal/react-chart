@@ -6,7 +6,9 @@ import { darkTheme } from "../themes/dark";
 echarts.registerTheme("my_theme", darkTheme);
 class AlphaaChart extends React.Component {
   render() {
-    return <ReactEcharts option={this.props.option} theme={"my_theme"} />;
+    if (this.props.chartType === "waterfall")
+      return <ReactEcharts option={this.props.option} theme={"my_theme"} />;
+    else return <ReactEcharts option={this.props.option} />;
   }
 }
 

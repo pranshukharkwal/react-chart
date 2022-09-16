@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import * as ReactDOMClient from "react-dom/client";
 import "./index.css";
 import _chartUtils from "./utils/chartUtils";
 import { IAlphaaCharts } from "./components/IAlphaaCharts";
@@ -27,7 +27,7 @@ class App extends React.Component {
   render() {
     var option = _chartUtils.getOption(this.state.chartType, this.state.data);
     return (
-      <div>
+      <div className="container main">
         <AlphaaChart chartType={this.state.chartType} option={option} />
         <IAlphaaCharts chartType={this.state.chartType} />
         <Toggle
@@ -39,5 +39,5 @@ class App extends React.Component {
   }
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOMClient.createRoot(document.getElementById("root"));
 root.render(<App />);
