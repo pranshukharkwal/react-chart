@@ -1,51 +1,101 @@
 function getWaterfallOption(data) {
   console.log("Data received in function ", data.data);
+  var positive = [],
+    negative = [],
+    help = [],
+    categories = [];
   var option = {
+    title: {
+      text: "Waterfall",
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      containLabel: true,
+    },
+    height: "400px",
     xAxis: {
       type: "category",
       splitLine: { show: false },
-      data: ["Total", "Rent", "Utilities", "Transportation", "Meals", "Other"],
+      data: [],
     },
     yAxis: {
       type: "value",
     },
     series: [
       {
-        name: "Placeholder",
         type: "bar",
-        stack: "Total",
+        stack: "all",
         itemStyle: {
-          borderColor: "transparent",
-          color: "transparent",
-        },
-        emphasis: {
-          itemStyle: {
-            borderColor: "transparent",
-            color: "transparent",
+          normal: {
+            barBorderColor: "rgba(0,0,0,0)",
+            color: "rgba(0,0,0,0)",
+          },
+          emphasis: {
+            barBorderColor: "rgba(0,0,0,0)",
+            color: "rgba(0,0,0,0)",
           },
         },
-        data: [0, 1700, 1400, 1200, 300, 0],
+        data: help,
       },
       {
-        name: "Life Cost",
+        name: "positive",
         type: "bar",
-        stack: "Total",
-        label: {
-          show: true,
-          position: "inside",
+        stack: "all",
+        data: positive,
+      },
+      {
+        name: "negative",
+        type: "bar",
+        stack: "all",
+        data: negative,
+        itemStyle: {
+          color: "#f33",
         },
-        data: [2900, 1200, 300, 200, 900, 300],
       },
     ],
   };
-  // if (data && data.data) {
-  //   data.data.forEach((category) => {
-  //     console.log(category);
-  //     option.xAxis.data.push(category["subcategory"]);
-  //     option.series[0].data.push(category["d__2021sale"]);
-  //     option.series[1].data.push(category["d__2022sale"]);
-  //   });
-  // }
+
+  if (data && data.data) {
+    var newData = [];
+    data.data.forEach((category) => {
+      newData.push({
+        difference: Math.round(category.d__2022sale - category.d__2021sale),
+        subcategory: category.subcategory,
+      });
+    });
+    newData.sort((a, b) => {
+      return b.difference - a.difference;
+    });
+
+    for (var i = 0, sum = 0; i < newData.length; ++i) {
+      categories.push(newData[i].subcategory);
+      if (newData[i].difference >= 0) {
+        positive.push(newData[i].difference);
+        negative.push("-");
+      } else {
+        positive.push("-");
+        negative.push(-newData[i].difference);
+      }
+
+      if (i === 0) {
+        help.push(0);
+      } else {
+        sum += newData[i - 1].difference;
+        if (newData[i].difference < 0) {
+          help.push(sum + newData[i].difference);
+        } else {
+          help.push(sum);
+        }
+      }
+    }
+
+    option.xAxis.data = categories;
+    option.series[0].data = help;
+    option.series[1].data = positive;
+    option.series[2].data = negative;
+  }
   return option;
 }
 

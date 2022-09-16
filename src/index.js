@@ -27,7 +27,7 @@ class App extends React.Component {
   render() {
     var option = _chartUtils.getOption(this.state.chartType, this.state.data);
     return (
-      <div className="container main">
+      <div className="main">
         <AlphaaChart chartType={this.state.chartType} option={option} />
         <IAlphaaCharts chartType={this.state.chartType} />
         <Toggle

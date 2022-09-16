@@ -10,3 +10,6 @@
     height: 100vh;
     background: rgba(38, 166, 154, 0.26)
 }
+.echarts-for-react {
+    height: 500px !important;
+}
