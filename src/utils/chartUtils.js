@@ -1,4 +1,5 @@
 function getWaterfallOption(data) {
+  console.log("Data received in function ", data.data);
   var option = {
     xAxis: {
       type: "category",
@@ -37,6 +38,14 @@ function getWaterfallOption(data) {
       },
     ],
   };
+  // if (data && data.data) {
+  //   data.data.forEach((category) => {
+  //     console.log(category);
+  //     option.xAxis.data.push(category["subcategory"]);
+  //     option.series[0].data.push(category["d__2021sale"]);
+  //     option.series[1].data.push(category["d__2022sale"]);
+  //   });
+  // }
   return option;
 }
 
