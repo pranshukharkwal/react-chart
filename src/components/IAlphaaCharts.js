@@ -11,6 +11,14 @@ class Summary extends React.Component {
   }
 }
 
+function Information(props) {
+  return (
+    <div className="summary center">
+      <p>{props.content}</p>
+    </div>
+  );
+}
+
 class IAlphaaCharts extends React.Component {
   render() {
     var content = "";
@@ -30,4 +38,4 @@ class IAlphaaCharts extends React.Component {
   }
 }
 
-export { IAlphaaCharts };
+export { Information, IAlphaaCharts };

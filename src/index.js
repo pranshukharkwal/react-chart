@@ -2,9 +2,10 @@ import React from "react";
 import * as ReactDOMClient from "react-dom/client";
 import "./index.css";
 import _chartUtils from "./utils/chartUtils";
-import { IAlphaaCharts } from "./components/IAlphaaCharts";
+import { IAlphaaCharts, Information } from "./components/IAlphaaCharts";
 import { AlphaaChart } from "./components/AlphaaChart";
 import { Toggle } from "./components/Toggle";
+import { DataInput } from "./components/DataInput";
 
 class App extends React.Component {
   constructor(props) {
@@ -12,7 +13,9 @@ class App extends React.Component {
     this.state = {
       chartType: "waterfall",
       data: {},
+      inputData: "",
     };
+    this.handleChange = this.handleChange.bind(this);
   }
 
   componentDidMount() {
@@ -24,8 +27,17 @@ class App extends React.Component {
   handleClick(chartType) {
     this.setState({ chartType: chartType });
   }
+
+  handleChange(event) {
+    this.setState({ inputData: event.target.value });
+  }
+
   render() {
-    var option = _chartUtils.getOption(this.state.chartType, this.state.data);
+    var { option, usingInputData } = _chartUtils.getOption(
+      this.state.chartType,
+      this.state.data,
+      this.state.inputData
+    );
     return (
       <div className="main">
         <AlphaaChart chartType={this.state.chartType} option={option} />
@@ -34,6 +46,19 @@ class App extends React.Component {
           waterfallClick={() => this.handleClick("waterfall")}
           netDifferenceClick={() => this.handleClick("net-difference")}
         />
+        <DataInput
+          handleChange={(e) => this.handleChange(e)}
+          inputData={this.state.inputData}
+        />
+        {usingInputData ? (
+          <Information content={"Using input data to plot charts"} />
+        ) : (
+          <Information
+            content={
+              "Using default data fetched from API. Not using input data either becuase it is empty, or not properly formatted"
+            }
+          />
+        )}
       </div>
     );
   }

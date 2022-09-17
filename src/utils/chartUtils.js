@@ -1,5 +1,4 @@
 function getWaterfallOption(data) {
-  console.log("Data received in function ", data.data);
   var positive = [],
     negative = [],
     help = [],
@@ -51,6 +50,12 @@ function getWaterfallOption(data) {
         type: "bar",
         stack: "all",
         data: positive,
+        label: {
+          normal: {
+            show: true,
+            position: "top",
+          },
+        },
       },
       {
         name: "negative",
@@ -60,6 +65,12 @@ function getWaterfallOption(data) {
         itemStyle: {
           color: "#f33",
         },
+        label: {
+          normal: {
+            show: true,
+            position: "bottom",
+          },
+        },
       },
     ],
   };
@@ -68,7 +79,8 @@ function getWaterfallOption(data) {
     var newData = [];
     data.data.forEach((category) => {
       newData.push({
-        difference: Math.round(category.d__2022sale - category.d__2021sale),
+        difference:
+          Math.round((category.d__2022sale - category.d__2021sale) * 100) / 100,
         subcategory: category.subcategory,
       });
     });
@@ -127,7 +139,6 @@ function getNetDifferenceOption(data) {
           shadowOffsetY: 2,
         },
       },
-      // data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       data: [],
     },
     yAxis: {
@@ -138,36 +149,85 @@ function getNetDifferenceOption(data) {
         // data: [120, 200, 150, 80, 70, 110, 130],
         data: [],
         type: "bar",
+        label: {
+          normal: {
+            show: true,
+            position: "top",
+          },
+        },
+        stack: "all",
+      },
+      {
+        // data: [120, 200, 150, 80, 70, 110, 130],
+        data: [],
+        type: "bar",
+        label: {
+          normal: {
+            show: true,
+            position: "bottom",
+          },
+        },
+        stack: "all",
+        itemStyle: {
+          color: "#f33",
+        },
       },
     ],
   };
   if (data && data.data) {
     var categories = [],
-      bar = [];
+      positive = [],
+      negative = [];
     data.data.forEach((category) => {
-      bar.push(Math.round(category.d__2022sale - category.d__2021sale));
+      var value =
+        Math.round((category.d__2022sale - category.d__2021sale) * 100) / 100;
+      if (value < 0) {
+        negative.push(value);
+        positive.push("-");
+      } else {
+        negative.push("-");
+        positive.push(value);
+      }
       categories.push(category.subcategory);
     });
   }
   option.xAxis.data = categories;
-  option.series[0].data = bar;
+  option.series[0].data = positive;
+  option.series[1].data = negative;
   return option;
 }
 
-function getOption(chartType, data) {
-  console.log("chartType", data);
-  let option;
-  switch (chartType) {
-    case "waterfall":
-      option = getWaterfallOption(data);
-      break;
-    case "net-difference":
-      option = getNetDifferenceOption(data);
-      break;
-    default:
-      option = {};
+function getOption(chartType, data, inputData) {
+  let option, usingInputData;
+  console.log("Received input data", inputData);
+  try {
+    usingInputData = true;
+    var inputObj = JSON.parse(inputData);
+    switch (chartType) {
+      case "waterfall":
+        option = getWaterfallOption(inputObj);
+        break;
+      case "net-difference":
+        option = getNetDifferenceOption(inputObj);
+        break;
+      default:
+        option = {};
+    }
+  } catch {
+    console.log("Failed");
+    usingInputData = false;
+    switch (chartType) {
+      case "waterfall":
+        option = getWaterfallOption(data);
+        break;
+      case "net-difference":
+        option = getNetDifferenceOption(data);
+        break;
+      default:
+        option = {};
+    }
   }
-  return option;
+  return { option, usingInputData };
 }
 
 module.exports = { getOption };
