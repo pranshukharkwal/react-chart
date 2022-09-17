@@ -2,8 +2,10 @@ function getWaterfallOption(data) {
   var positive = [],
     negative = [],
     help = [],
+    total = [],
     categories = [];
   var option = {
+    legend: {},
     title: {
       text: "Waterfall",
     },
@@ -15,14 +17,17 @@ function getWaterfallOption(data) {
     },
     xAxis: {
       type: "category",
-      splitLine: { show: false },
+      splitLine: { show: true },
       axisLine: {
         lineStyle: {
           width: 1,
-          color: "white",
+          color: "black",
           shadowColor: "black",
           shadowOffsetY: 2,
         },
+      },
+      axisLabel: {
+        interval: 0,
       },
       data: [],
     },
@@ -56,6 +61,15 @@ function getWaterfallOption(data) {
             position: "top",
           },
         },
+        axisLine: {
+          symbol: "arrow",
+          lineStyle: {
+            type: "dashed",
+          },
+        },
+        itemStyle: {
+          color: "#bef1c6",
+        },
       },
       {
         name: "negative",
@@ -63,12 +77,27 @@ function getWaterfallOption(data) {
         stack: "all",
         data: negative,
         itemStyle: {
-          color: "#f33",
+          color: "#f5b4c4",
         },
         label: {
           normal: {
             show: true,
             position: "bottom",
+          },
+        },
+      },
+      {
+        name: "total",
+        type: "bar",
+        stack: "all",
+        data: total,
+        itemStyle: {
+          color: "#c8e7f9",
+        },
+        label: {
+          normal: {
+            show: true,
+            position: "middle",
           },
         },
       },
@@ -87,9 +116,10 @@ function getWaterfallOption(data) {
     newData.sort((a, b) => {
       return b.difference - a.difference;
     });
-
-    for (var i = 0, sum = 0; i < newData.length; ++i) {
+    var sum = 0;
+    for (var i = 0; i < newData.length; ++i) {
       categories.push(newData[i].subcategory);
+      total.push("-");
       if (newData[i].difference >= 0) {
         positive.push(newData[i].difference);
         negative.push("-");
@@ -109,11 +139,19 @@ function getWaterfallOption(data) {
         }
       }
     }
+    sum += newData[newData.length - 1].difference;
+    sum = Math.round(sum * 100) / 100;
+    positive.push("-");
+    negative.push("-");
+    help.push("-");
+    total.push(sum);
+    categories.push("Total");
 
     option.xAxis.data = categories;
     option.series[0].data = help;
     option.series[1].data = positive;
     option.series[2].data = negative;
+    option.series[3].data = total;
   }
   return option;
 }
