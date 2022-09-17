@@ -14,10 +14,17 @@ function getWaterfallOption(data) {
       bottom: "3%",
       containLabel: true,
     },
-    height: "400px",
     xAxis: {
       type: "category",
       splitLine: { show: false },
+      axisLine: {
+        lineStyle: {
+          width: 1,
+          color: "white",
+          shadowColor: "black",
+          shadowOffsetY: 2,
+        },
+      },
       data: [],
     },
     yAxis: {
@@ -101,20 +108,49 @@ function getWaterfallOption(data) {
 
 function getNetDifferenceOption(data) {
   var option = {
+    title: {
+      text: "Net Difference",
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      containLabel: true,
+    },
     xAxis: {
       type: "category",
-      data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      axisLine: {
+        lineStyle: {
+          width: 1,
+          color: "black",
+          shadowColor: "black",
+          shadowOffsetY: 2,
+        },
+      },
+      // data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      data: [],
     },
     yAxis: {
       type: "value",
     },
     series: [
       {
-        data: [120, 200, 150, 80, 70, 110, 130],
+        // data: [120, 200, 150, 80, 70, 110, 130],
+        data: [],
         type: "bar",
       },
     ],
   };
+  if (data && data.data) {
+    var categories = [],
+      bar = [];
+    data.data.forEach((category) => {
+      bar.push(Math.round(category.d__2022sale - category.d__2021sale));
+      categories.push(category.subcategory);
+    });
+  }
+  option.xAxis.data = categories;
+  option.series[0].data = bar;
   return option;
 }
 
