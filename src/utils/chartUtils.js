@@ -28,6 +28,7 @@ function getWaterfallOption(data) {
       },
       axisLabel: {
         interval: 0,
+        rotate: 90,
       },
       data: [],
     },
