@@ -107,36 +107,60 @@ function getWaterfallOption(data) {
 
   if (data && data.data) {
     var newData = [];
+    var curSum = 0;
     data.data.forEach((category) => {
+      var val =
+        Math.round((category.d__2022sale - category.d__2021sale) * 100) / 100;
+      curSum += val;
       newData.push({
-        difference:
-          Math.round((category.d__2022sale - category.d__2021sale) * 100) / 100,
+        difference: val,
         subcategory: category.subcategory,
       });
     });
-    newData.sort((a, b) => {
-      return b.difference - a.difference;
-    });
+    if (curSum < 0) {
+      newData.sort((a, b) => {
+        return a.difference - b.difference;
+      });
+    } else {
+      newData.sort((a, b) => {
+        return b.difference - a.difference;
+      });
+    }
+
     var sum = 0;
     for (var i = 0; i < newData.length; ++i) {
       categories.push(newData[i].subcategory);
       total.push("-");
       if (newData[i].difference >= 0) {
-        positive.push(newData[i].difference);
+        if (curSum < 0) positive.push(-newData[i].difference);
+        else positive.push(newData[i].difference);
         negative.push("-");
       } else {
         positive.push("-");
-        negative.push(-newData[i].difference);
+        if (curSum < 0) negative.push(newData[i].difference);
+        else negative.push(-newData[i].difference);
       }
 
-      if (i === 0) {
-        help.push(0);
+      if (curSum < 0) {
+        if (i === 0) help.push(0);
+        else {
+          sum += newData[i - 1].difference;
+          if (newData[i].difference > 0) {
+            help.push(sum + newData[i].difference);
+          } else {
+            help.push(sum);
+          }
+        }
       } else {
-        sum += newData[i - 1].difference;
-        if (newData[i].difference < 0) {
-          help.push(sum + newData[i].difference);
+        if (i === 0) {
+          help.push(0);
         } else {
-          help.push(sum);
+          sum += newData[i - 1].difference;
+          if (newData[i].difference < 0) {
+            help.push(sum + newData[i].difference);
+          } else {
+            help.push(sum);
+          }
         }
       }
     }
@@ -270,3 +294,5 @@ function getOption(chartType, data, inputData) {
 }
 
 module.exports = { getOption };
+
+
