@@ -136,21 +136,20 @@ function getWaterfallOption(data) {
       categories.push(newData[i].subcategory);
       total.push("-");
       if (newData[i].difference >= 0) {
-        if (curSum < 0) positive.push(-newData[i].difference);
-        else positive.push(newData[i].difference);
+        positive.push(newData[i].difference);
         negative.push("-");
       } else {
         positive.push("-");
-        if (curSum < 0) negative.push(newData[i].difference);
-        else negative.push(-newData[i].difference);
+        negative.push(-newData[i].difference);
       }
 
       if (curSum < 0) {
-        if (i === 0) help.push(0);
-        else {
-          sum += newData[i - 1].difference;
+        if (i === 0) {
+          help.push(0);
+        } else {
+          sum += -1 * newData[i - 1].difference;
           if (newData[i].difference > 0) {
-            help.push(sum + newData[i].difference);
+            help.push(sum - newData[i].difference);
           } else {
             help.push(sum);
           }
@@ -168,7 +167,9 @@ function getWaterfallOption(data) {
         }
       }
     }
-    sum += newData[newData.length - 1].difference;
+
+    if (curSum < 0) sum += -1 * newData[newData.length - 1].difference;
+    else sum += newData[newData.length - 1].difference;
     sum = Math.round(sum * 100) / 100;
     positive.push("-");
     negative.push("-");
@@ -186,6 +187,8 @@ function getWaterfallOption(data) {
 }
 
 function getNetDifferenceOption(data) {
+  var profit = 0,
+    loss = 0;
   var option = {
     title: {
       text: "Net Difference",
@@ -251,9 +254,11 @@ function getNetDifferenceOption(data) {
       if (value < 0) {
         negative.push(value);
         positive.push("-");
+        loss += value;
       } else {
         negative.push("-");
         positive.push(value);
+        profit += value;
       }
       categories.push(category.subcategory);
     });
@@ -261,11 +266,16 @@ function getNetDifferenceOption(data) {
   option.xAxis.data = categories;
   option.series[0].data = positive;
   option.series[1].data = negative;
-  return option;
+  return { option: option, profit: profit, loss: loss };
 }
 
 function getOption(chartType, data, inputData) {
-  let option, usingInputData, profit, loss, net, result;
+  let option,
+    usingInputData,
+    profit = 0,
+    loss = 0,
+    net,
+    result;
   console.log("Received input data", inputData);
   console.log("Received api data", data);
   try {
@@ -279,7 +289,10 @@ function getOption(chartType, data, inputData) {
         loss = result.loss;
         break;
       case "net-difference":
-        option = getNetDifferenceOption(inputObj);
+        result = getNetDifferenceOption(inputObj);
+        option = result.option;
+        profit = result.profit;
+        loss = result.loss;
         break;
       default:
         option = {};
@@ -295,7 +308,10 @@ function getOption(chartType, data, inputData) {
         loss = result.loss;
         break;
       case "net-difference":
-        option = getNetDifferenceOption(data);
+        result = getNetDifferenceOption(data);
+        option = result.option;
+        profit = result.profit;
+        loss = result.loss;
         break;
       default:
         option = {};
