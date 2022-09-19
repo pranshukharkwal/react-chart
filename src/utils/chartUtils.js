@@ -4,10 +4,12 @@ function getWaterfallOption(data) {
     help = [],
     total = [],
     categories = [];
+  var profit = 0,
+    loss = 0;
   var option = {
     legend: {},
     title: {
-      text: "Waterfall",
+      text: "Accumulated Waterfall Chart",
     },
     grid: {
       left: "3%",
@@ -111,6 +113,8 @@ function getWaterfallOption(data) {
     data.data.forEach((category) => {
       var val =
         Math.round((category.d__2022sale - category.d__2021sale) * 100) / 100;
+      if (val < 0) loss += val;
+      else profit += val;
       curSum += val;
       newData.push({
         difference: val,
@@ -178,7 +182,7 @@ function getWaterfallOption(data) {
     option.series[2].data = negative;
     option.series[3].data = total;
   }
-  return option;
+  return { option: option, profit: profit, loss: loss };
 }
 
 function getNetDifferenceOption(data) {
@@ -261,14 +265,18 @@ function getNetDifferenceOption(data) {
 }
 
 function getOption(chartType, data, inputData) {
-  let option, usingInputData;
+  let option, usingInputData, profit, loss, net, result;
   console.log("Received input data", inputData);
+  console.log("Received api data", data);
   try {
     usingInputData = true;
     var inputObj = JSON.parse(inputData);
     switch (chartType) {
       case "waterfall":
-        option = getWaterfallOption(inputObj);
+        result = getWaterfallOption(inputObj);
+        option = result.option;
+        profit = result.profit;
+        loss = result.loss;
         break;
       case "net-difference":
         option = getNetDifferenceOption(inputObj);
@@ -281,7 +289,10 @@ function getOption(chartType, data, inputData) {
     usingInputData = false;
     switch (chartType) {
       case "waterfall":
-        option = getWaterfallOption(data);
+        result = getWaterfallOption(data);
+        option = result.option;
+        profit = result.profit;
+        loss = result.loss;
         break;
       case "net-difference":
         option = getNetDifferenceOption(data);
@@ -290,7 +301,10 @@ function getOption(chartType, data, inputData) {
         option = {};
     }
   }
-  return { option, usingInputData };
+  profit = profit.toFixed(2);
+  loss = Math.abs(loss).toFixed(2);
+  net = (profit - loss).toFixed(2);
+  return { option, usingInputData, profit, loss, net };
 }
 
 module.exports = { getOption };
