@@ -1,66 +1,82 @@
 <script>
+                          function getKeys(data) {
+                            var categoryKey, dataKeys = [];
+                            data.parameters.forEach((parameter) => {
+                              if (parameter.type === "columns") categoryKey = parameter.key;
+                              else if (parameter.type === "vs") dataKeys.push(parameter.key);
+                            });
+                            dataKeys.sort().reverse();
+                            return { categoryKey: categoryKey, dataKeys: dataKeys };
+                          }
+                        
   fetch("https://run.mocky.io/v3/f8d88ddf-41be-4432-9ed8-ef11382fc6a7")
     .then((resp) => resp.json())
     .then((rawData) => {
-      var option = {
-        xAxis: {
-          type: "category",
-          splitLine: { show: false },
-          data: ["Total", "Rent", "Utilities", "Transportation", "Meals", "Other"],
-        },
-        yAxis: {
-          type: "value",
-        },
-        series: [
-          {
-            name: "Placeholder",
-            type: "bar",
-            stack: "Total",
-            itemStyle: {
-              borderColor: "transparent",
-              color: "transparent",
-            },
-            emphasis: {
-              itemStyle: {
-                borderColor: "transparent",
-                color: "transparent",
-              },
-            },
-            data: [0, 1700, 1400, 1200, 300, 0],
-          },
-          {
-            name: "Life Cost",
-            type: "bar",
-            stack: "Total",
-            label: {
-              show: true,
-              position: "inside",
-            },
-            data: [2900, 1200, 300, 200, 900, 300],
-          },
-        ],
-      };
-      var data = rawData.data;
-      var newData = [];
-      var total = 0;
-      for (var i = 0; i < data.length; i++) {
-        var category = data[i];
-        newData.push({
-          difference: Math.round(data[i].d__2022sale - data[i].d__2021sale),
-          subcategory: data[i].subcategory
-        })
-        total += newData[i].difference;
-      }
-      newData.sort((a, b) => {
-        return b.difference - a.difference;
-      });
-      var runningTotal = 0;
-      for (var i = 0; i < data.length; i++) {
-        option.xAxis.data.push(newData["subcategory"]);
-        option.series[0].data.push(runningTotal);
-        runningTotal += newData[i].difference;
-        option.series[1].data.push(runningTotal);
-      }
-      console.log(newData);
+      // var option = {
+      //   xAxis: {
+      //     type: "category",
+      //     splitLine: { show: false },
+      //     data: ["Total", "Rent", "Utilities", "Transportation", "Meals", "Other"],
+      //   },
+      //   yAxis: {
+      //     type: "value",
+      //   },
+      //   series: [
+      //     {
+      //       name: "Placeholder",
+      //       type: "bar",
+      //       stack: "Total",
+      //       itemStyle: {
+      //         borderColor: "transparent",
+      //         color: "transparent",
+      //       },
+      //       emphasis: {
+      //         itemStyle: {
+      //           borderColor: "transparent",
+      //           color: "transparent",
+      //         },
+      //       },
+      //       data: [0, 1700, 1400, 1200, 300, 0],
+      //     },
+      //     {
+      //       name: "Life Cost",
+      //       type: "bar",
+      //       stack: "Total",
+      //       label: {
+      //         show: true,
+      //         position: "inside",
+      //       },
+      //       data: [2900, 1200, 300, 200, 900, 300],
+      //     },
+      //   ],
+      // };
+      // var data = rawData.data;
+      // var newData = [];
+      // var total = 0;
+      // for (var i = 0; i < data.length; i++) {
+      //   var category = data[i];
+      //   newData.push({
+      //     difference: Math.round(data[i].d__2022sale - data[i].d__2021sale),
+      //     subcategory: data[i].subcategory
+      //   })
+      //   total += newData[i].difference;
+      // }
+      // newData.sort((a, b) => {
+      //   return b.difference - a.difference;
+      // });
+      // var runningTotal = 0;
+      // for (var i = 0; i < data.length; i++) {
+      //   option.xAxis.data.push(newData["subcategory"]);
+      //   option.series[0].data.push(runningTotal);
+      //   runningTotal += newData[i].difference;
+      //   option.series[1].data.push(runningTotal);
+      // }
+      // console.log(newData);
+
+      var result = getKeys(rawData);
+      var dataKeys = result.dataKeys;
+
+      console.log("category Key : ", result.categoryKey);
+      console.log("data keys : ", dataKeys);
     });
 </script>

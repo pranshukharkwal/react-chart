@@ -25,7 +25,9 @@ class App extends React.Component {
   componentDidMount() {
     fetch("https://run.mocky.io/v3/f8d88ddf-41be-4432-9ed8-ef11382fc6a7")
       .then((resp) => resp.json())
-      .then((data) => this.setState({ data }));
+      .then((data) => {
+        this.setState({ data });
+      });
   }
 
   handleClick(chartType) {

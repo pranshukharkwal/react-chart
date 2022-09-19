@@ -1,4 +1,21 @@
-function getWaterfallOption(data) {
+function getKeys(data) {
+  console.log("Data received in get keys", data);
+  var categoryKey,
+    dataKeys = [];
+  if (data && data.parameters) {
+    data.parameters.forEach((parameter) => {
+      if (parameter.type === "columns") categoryKey = parameter.key;
+      else if (parameter.type === "vs") dataKeys.push(parameter.key);
+    });
+  } else {
+    console.log("Parameters do not exists");
+  }
+  dataKeys.sort().reverse();
+  return { categoryKey: categoryKey, dataKeys: dataKeys };
+}
+
+function getWaterfallOption(data, keysResult) {
+  console.log("Keys result", keysResult);
   var positive = [],
     negative = [],
     help = [],
@@ -112,13 +129,17 @@ function getWaterfallOption(data) {
     var curSum = 0;
     data.data.forEach((category) => {
       var val =
-        Math.round((category.d__2022sale - category.d__2021sale) * 100) / 100;
+        Math.round(
+          (category[keysResult.dataKeys[0]] -
+            category[keysResult.dataKeys[1]]) *
+            100
+        ) / 100;
       if (val < 0) loss += val;
       else profit += val;
       curSum += val;
       newData.push({
         difference: val,
-        subcategory: category.subcategory,
+        subcategory: category[keysResult.categoryKey],
       });
     });
     if (curSum < 0) {
@@ -168,6 +189,8 @@ function getWaterfallOption(data) {
       }
     }
 
+    console.log("Categories :", categories);
+
     if (curSum < 0) sum += -1 * newData[newData.length - 1].difference;
     else sum += newData[newData.length - 1].difference;
     sum = Math.round(sum * 100) / 100;
@@ -186,7 +209,7 @@ function getWaterfallOption(data) {
   return { option: option, profit: profit, loss: loss };
 }
 
-function getNetDifferenceOption(data) {
+function getNetDifferenceOption(data, keysResult) {
   var profit = 0,
     loss = 0;
   var option = {
@@ -250,7 +273,11 @@ function getNetDifferenceOption(data) {
       negative = [];
     data.data.forEach((category) => {
       var value =
-        Math.round((category.d__2022sale - category.d__2021sale) * 100) / 100;
+        Math.round(
+          (category[keysResult.dataKeys[0]] -
+            category[keysResult.dataKeys[1]]) *
+            100
+        ) / 100;
       if (value < 0) {
         negative.push(value);
         positive.push("-");
@@ -260,7 +287,7 @@ function getNetDifferenceOption(data) {
         positive.push(value);
         profit += value;
       }
-      categories.push(category.subcategory);
+      categories.push(category[keysResult.categoryKey]);
     });
   }
   option.xAxis.data = categories;
@@ -278,18 +305,21 @@ function getOption(chartType, data, inputData) {
     result;
   console.log("Received input data", inputData);
   console.log("Received api data", data);
+  var keysResult;
   try {
     usingInputData = true;
     var inputObj = JSON.parse(inputData);
+    if (!inputObj.parameters) throw Error("No parameters defined");
+    keysResult = getKeys(inputObj);
     switch (chartType) {
       case "waterfall":
-        result = getWaterfallOption(inputObj);
+        result = getWaterfallOption(inputObj, keysResult);
         option = result.option;
         profit = result.profit;
         loss = result.loss;
         break;
       case "net-difference":
-        result = getNetDifferenceOption(inputObj);
+        result = getNetDifferenceOption(inputObj, keysResult);
         option = result.option;
         profit = result.profit;
         loss = result.loss;
@@ -300,15 +330,16 @@ function getOption(chartType, data, inputData) {
   } catch {
     console.log("Failed");
     usingInputData = false;
+    keysResult = getKeys(data);
     switch (chartType) {
       case "waterfall":
-        result = getWaterfallOption(data);
+        result = getWaterfallOption(data, keysResult);
         option = result.option;
         profit = result.profit;
         loss = result.loss;
         break;
       case "net-difference":
-        result = getNetDifferenceOption(data);
+        result = getNetDifferenceOption(data, keysResult);
         option = result.option;
         profit = result.profit;
         loss = result.loss;
@@ -324,5 +355,3 @@ function getOption(chartType, data, inputData) {
 }
 
 module.exports = { getOption };
-
-
