@@ -1,6 +1,7 @@
 import React from 'react';
 import { Chart } from './Chart';
 import dummyData from "../data/dummy.json"
+import defaultData from "../data/default.json"
 export default {
   title: 'Example/Chart',
   component: Chart

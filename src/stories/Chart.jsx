@@ -6,12 +6,14 @@ import _chartUtils from "../utils/chartUtils";
 
 export const Chart = ({ data, chartType, ...props }) => {
   let [op, setOp] = React.useState({});
+  let [ct , setCt] = React.useState(chartType);
   useEffect(() => {
     var { option, ...remaining } = _chartUtils.getOption(chartType, data, null);
     console.log(option);
     setOp(option);
-  }, [data]);
-  return <AlphaaChart chartType={chartType} option={op} />;
+    setCt(chartType)
+  }, [data , chartType]);
+  return <AlphaaChart chartType={ct} option={op} />;
 };
 
 Chart.propTypes = {
